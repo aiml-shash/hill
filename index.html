@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hill Climb 3D — Take the scenic route</title><meta name="description" content="A playable 3D hill climbing adventure. Drive, balance, collect, and upgrade across seven wild landscapes."><meta property="og:title" content="Hill Climb 3D"><meta property="og:description" content="Take the scenic route. Seven landscapes. Six vehicles. One more hill."><meta property="og:image" content="https://hill-climb-3d-trails.higgsfield.app/assets/cover.png"><meta name="theme-color" content="#183f35"><link rel="icon" href="./assets/favicon.svg"><link rel="stylesheet" href="./style.css"></head>
+<body>
+<canvas id="world" aria-label="3D hill climbing game"></canvas>
+<div id="loading"><div class="loader"></div><b>Preparing your next adventure</b><span>Building the mountains…</span></div>
+<div id="fatal" hidden><h1>Unable to start 3D graphics</h1><p id="fatalText">Enable hardware acceleration and use a browser with WebGL 2 support.</p><button onclick="location.reload()">Try again</button></div>
+<div id="app">
+<header id="header"><button class="brand" data-action="menu" aria-label="Main menu"><svg viewBox="0 0 48 32" aria-hidden="true"><path d="M2 28 16 6l9 14 7-11 14 19H2Z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="m12 12 4 4 4-4" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>HILL CLIMB <small>3D</small></span></button><div class="header-right"><span class="badge">DESKTOP ADVENTURE</span><span class="wallet"><i class="coin-icon"></i><b id="bank">0</b></span><button class="icon-btn" data-action="settings" aria-label="Settings">⚙</button></div></header>
+<main id="menu">
+<section class="hero"><div class="eyebrow"><span></span> GO A LITTLE FURTHER</div><h1>HILL<br>CLIMB <em>3D</em></h1><p>Big hills. Small victories.<br>Your next adventure is just over the ridge.</p><button class="play-btn" data-action="play"><span>LET’S DRIVE</span><span>↗</span></button><div class="hero-meta"><span><kbd>W</kbd> TO ACCELERATE</span><span>ONE MORE HILL.</span></div></section>
+<div class="scene-caption"><span class="live-dot"></span><span id="sceneMap">GREEN HILLS</span><small id="sceneVehicle">JEEP • READY TO ROAM</small></div>
+<nav class="menu-dock" aria-label="Game menu"><button data-action="garage"><span class="nav-symbol">▰</span><b>Garage</b><small id="garageCount">1 / 6 vehicles</small><span>↗</span></button><button data-action="levels"><span class="nav-symbol">♧</span><b>Explore</b><small id="mapCount">1 / 7 landscapes</small><span>↗</span></button><button data-action="upgrades"><span class="nav-symbol">↟</span><b>Upgrades</b><small>Build your advantage</small><span>↗</span></button><button data-action="help"><span class="nav-symbol">⌘</span><b>How to play</b><small>Find your balance</small><span>↗</span></button></nav>
+<footer class="menu-footer"><span>TAKE THE SCENIC ROUTE.</span><span>BEST DISTANCE <b id="menuBest">0 m</b></span></footer>
+</main>
+<section id="hud" hidden aria-label="Game status">
+<div class="hud-status glass"><div class="meter-label"><span>⛽ FUEL</span><b id="fuelValue">100%</b></div><div class="meter"><i id="fuelBar"></i></div><div class="meter-label health"><span>VEHICLE HEALTH</span><b id="healthValue">100%</b></div><div class="meter health-meter"><i id="healthBar"></i></div></div>
+<div class="hud-center glass"><span id="runMap">GREEN HILLS</span><div><strong id="distance">0</strong><small>m</small></div><p>SCORE <b id="score">0</b> <span>BEST <b id="best">0 m</b></span></p></div>
+<div class="hud-right"><div class="glass speed-panel"><div><i class="coin-icon"></i> <b id="coins">0</b></div><strong id="speed">0</strong><small>KM/H</small></div><button data-action="pause" class="pause-btn" aria-label="Pause game">Ⅱ</button></div>
+<div class="route-goal glass"><span id="goalLabel">NEXT CHECKPOINT</span><b id="goalDistance">200 m</b><div class="meter"><i id="goalBar"></i></div></div>
+<div class="controls glass"><span><kbd>W</kbd> <kbd>↑</kbd> Accelerate</span><span><kbd>S</kbd> <kbd>↓</kbd> Brake</span><span><kbd>A</kbd><kbd>D</kbd> Balance</span><span><kbd>SPACE</kbd> Handbrake</span><span><kbd>R</kbd> Restart</span><span><kbd>P</kbd> Pause</span></div>
+</section>
+<div id="toast" role="status" aria-live="polite"></div><div id="crashFlash"></div>
+<div id="modal" hidden><section class="dialog" role="dialog" aria-modal="true" aria-labelledby="dialogTitle"><button class="close-btn" data-action="close" aria-label="Close">×</button><div id="dialogContent"></div></section></div>
+<pre id="debug" hidden></pre>
+</div>
+<script>window.addEventListener('error',e=>{if(!window.game){document.getElementById('loading').hidden=true;document.getElementById('fatal').hidden=false;document.getElementById('fatalText').textContent='The game could not load. Open this folder with VS Code Live Server. '+e.message;}});</script>
+<script type="module" src="./game.js"></script>
+</body></html>
