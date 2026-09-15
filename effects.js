@@ -1,4 +1,4 @@
-import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
+import * as THREE from "https://unpkg.com/three@0.180.0/build/three.module.js";
 export class Effects{
  constructor(scene){
  this.count=250;this.pos=new Float32Array(this.count*3);this.life=new Float32Array(this.count);this.vel=new Float32Array(this.count*3);this.cursor=0;
