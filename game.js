@@ -1,4 +1,4 @@
-import * as THREE from './assets/vendor/three.module.js';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 import {MAPS,stats,clamp} from './config.js';
 import {Save} from './save.js';
 import {Track} from './track.js';

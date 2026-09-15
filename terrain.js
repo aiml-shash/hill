@@ -1,4 +1,4 @@
-import * as THREE from './assets/vendor/three.module.js';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 import {hash} from './track.js';
 export class Terrain{
  constructor(scene,track){

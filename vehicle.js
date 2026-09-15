@@ -1,4 +1,4 @@
-import * as THREE from './assets/vendor/three.module.js';
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 export class Vehicle{
  constructor(scene,id,v){
  this.group=new THREE.Group();scene.add(this.group);this.wheels=[];this.springs=[];this.v=v;this.id=id;
