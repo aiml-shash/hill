@@ -70,6 +70,6 @@ fx-=.008*s.vx*Math.abs(s.vx);s.vx=clamp(s.vx+fx/v.mass*dt,-9,160934);s.vy+=fy/v.
  if(s.fuel<=0){s.empty+=dt;if(Math.abs(s.vx)<.5&&s.empty>2)s.dead='OUT OF FUEL';if(s.empty>14)s.dead='OUT OF FUEL';}
  if(s.health<=0||s.upside>1.8||impact>24)s.dead='VEHICLE WRECKED';
  if(s.y<this.track.base(s.x)-30)s.dead='LOST IN THE VALLEY';
- s.health=clamp(s.health,100);return events;
+ s.health=clamp(s.health,0,100);return events;
  }
 }
