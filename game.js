@@ -10,26 +10,117 @@ import {AudioSystem} from './audio.js';
 import {UI} from './ui.js';
 
 class Game{
- constructor(){
- this.save=new Save();this.audio=new AudioSystem(this.save.data.settings);this.mode='menu';this.keys=new Set();this.input={throttle:0,brake:0,tilt:0,handbrake:false};this.accumulator=0;this.clock=0;this.shake=0;this.crashTime=0;this.hudTime=0;this.saveTime=0;this.runCoins=0;this.bonus=0;this.checkpoint=0;this.taken=new Set();this.hit=new Set();
- this.scene=new THREE.Scene();this.camera=new THREE.PerspectiveCamera(50,innerWidth/innerHeight,.1,800);
- this.renderer=new THREE.WebGLRenderer({canvas:document.getElementById('world'),antialias:true,alpha:false,powerPreference:'high-performance'});
- this.renderer.outputColorSpace=THREE.SRGBColorSpace;this.renderer.toneMapping=THREE.ACESFilmicToneMapping;this.renderer.toneMappingExposure=1.2;
- this.renderer.shadowMap.type=THREE.PCFSoftShadowMap;
- this.ambient=new THREE.HemisphereLight(0xf0f6e8,0x526443,2.3);this.scene.add(this.ambient);
- this.sun=new THREE.DirectionalLight(0xffedc5,3);this.sun.castShadow=true;this.sun.shadow.mapSize.set(1024,1024);Object.assign(this.sun.shadow.camera,{left:-35,right:35,top:35,bottom:-35,near:1,far:130});this.sun.shadow.bias=-.0007;this.scene.add(this.sun,this.sun.target);
- this.sunOrb=new THREE.Mesh(new THREE.SphereGeometry(5,16,12),new THREE.MeshBasicMaterial({color:0xffe7aa}));this.scene.add(this.sunOrb);
- this.effects=new Effects(this.scene);this.look=new THREE.Vector3();this.desired=new THREE.Vector3();this.aim=new THREE.Vector3();this.targetColor=new THREE.Color();
- this.ui=new UI(this);this.preview();this.applySettings();this.bind();
- document.getElementById('loading').hidden=true;
- this.last=performance.now();this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
- this.touchInput = {
-  throttle: false,
-  brake: false,
-  left: false,
-  right: false
-};
- }
+ constructor() {
+  this.save = new Save();
+  this.audio = new AudioSystem(this.save.data.settings);
+
+  this.mode = 'menu';
+  this.keys = new Set();
+
+  this.input = {
+    throttle: 0,
+    brake: 0,
+    tilt: 0,
+    handbrake: false
+  };
+
+  // Mobile controls must be created before this.bind()
+  this.touchInput = {
+    throttle: false,
+    brake: false,
+    left: false,
+    right: false
+  };
+
+  this.accumulator = 0;
+  this.clock = 0;
+  this.shake = 0;
+  this.crashTime = 0;
+  this.hudTime = 0;
+  this.saveTime = 0;
+  this.runCoins = 0;
+  this.bonus = 0;
+  this.checkpoint = 0;
+  this.taken = new Set();
+  this.hit = new Set();
+
+  this.scene = new THREE.Scene();
+
+  this.camera = new THREE.PerspectiveCamera(
+    50,
+    innerWidth / innerHeight,
+    0.1,
+    800
+  );
+
+  const mobile = matchMedia('(pointer: coarse)').matches;
+
+  this.renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById('world'),
+    antialias: !mobile,
+    alpha: false,
+    powerPreference: mobile ? 'default' : 'high-performance',
+    failIfMajorPerformanceCaveat: false
+  });
+
+  this.renderer.outputColorSpace = THREE.SRGBColorSpace;
+  this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  this.renderer.toneMappingExposure = 1.2;
+  this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  this.ambient = new THREE.HemisphereLight(
+    0xf0f6e8,
+    0x526443,
+    2.3
+  );
+
+  this.scene.add(this.ambient);
+
+  this.sun = new THREE.DirectionalLight(0xffedc5, 3);
+  this.sun.castShadow = !mobile;
+  this.sun.shadow.mapSize.set(
+    mobile ? 512 : 1024,
+    mobile ? 512 : 1024
+  );
+
+  Object.assign(this.sun.shadow.camera, {
+    left: -35,
+    right: 35,
+    top: 35,
+    bottom: -35,
+    near: 1,
+    far: 130
+  });
+
+  this.sun.shadow.bias = -0.0007;
+  this.scene.add(this.sun, this.sun.target);
+
+  this.sunOrb = new THREE.Mesh(
+    new THREE.SphereGeometry(5, 16, 12),
+    new THREE.MeshBasicMaterial({ color: 0xffe7aa })
+  );
+
+  this.scene.add(this.sunOrb);
+
+  this.effects = new Effects(this.scene);
+  this.look = new THREE.Vector3();
+  this.desired = new THREE.Vector3();
+  this.aim = new THREE.Vector3();
+  this.targetColor = new THREE.Color();
+
+  this.ui = new UI(this);
+
+  this.preview();
+  this.applySettings();
+  this.bind();
+
+  document.getElementById('loading').hidden = true;
+
+  this.last = performance.now();
+  this.frame = this.frame.bind(this);
+  requestAnimationFrame(this.frame);
+}
+ 
  bind(){
  const control=new Set(['KeyW','ArrowUp','KeyS','ArrowDown','KeyA','ArrowLeft','KeyD','ArrowRight','Space','KeyR','KeyP','Escape']);
  addEventListener('keydown',e=>{
@@ -189,5 +280,6 @@ this.input.tilt = (left ? 1 : 0) - (right ? 1 : 0);
  requestAnimationFrame(this.frame);
  }
 }
+
 try{window.game=new Game();}catch(e){console.error(e);document.getElementById('loading').hidden=true;document.getElementById('fatal').hidden=false;document.getElementById('fatalText').textContent='Please use Live Server and enable browser hardware acceleration. '+e.message;}
 
