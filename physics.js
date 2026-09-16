@@ -31,7 +31,7 @@ export class Physics{
  s.grounded=contacts>0;
  torque+=input.tilt*(s.grounded?2.7:8)*v.mass;
  torque-=s.av*(s.grounded?3: .65)*v.mass;
-fx-=.008*s.vx*Math.abs(s.vx);s.vx=clamp(s.vx+fx/v.mass*dt,-9,v.speed*16);s.vy+=fy/v.mass*dt;
+fx-=.008*s.vx*Math.abs(s.vx);s.vx=clamp(s.vx+fx/v.mass*dt,-5,v.speed);s.vy+=fy/v.mass*dt;
  s.av=clamp(s.av+torque/(v.mass*2.4)*dt,-5.8,5.8);
  s.x+=s.vx*dt;s.y+=s.vy*dt;s.a+=s.av*dt;
  if(s.x<-12){s.x=-12;s.vx=Math.max(0,s.vx);}
