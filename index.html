@@ -1,4 +1,8 @@
 <!doctype html>
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hill Climb 3D — Take the scenic route</title><meta name="description" content="A playable 3D hill climbing adventure. Drive, balance, collect, and upgrade across seven wild landscapes."><meta property="og:title" content="Hill Climb 3D"><meta property="og:description" content="Take the scenic route. Seven landscapes. Six vehicles. One more hill."><meta property="og:image" content="https://hill-climb-3d-trails.higgsfield.app/assets/cover.png"><meta name="theme-color" content="#183f35"><link rel="icon" href="./assets/favicon.svg"><link rel="stylesheet" href="./style.css"></head>
 <body>
 <canvas id="world" aria-label="3D hill climbing game"></canvas>
@@ -25,4 +29,17 @@
 </div>
 <script>window.addEventListener('error',e=>{if(!window.game){document.getElementById('loading').hidden=true;document.getElementById('fatal').hidden=false;document.getElementById('fatalText').textContent='The game could not load. Open this folder with VS Code Live Server. '+e.message;}});</script>
 <script type="module" src="./game.js"></script>
+<div id="mobileControls">
+  <div class="mobile-group">
+    <button data-touch="left" aria-label="Tilt left">↶</button>
+    <button data-touch="right" aria-label="Tilt right">↷</button>
+  </div>
+
+  <div class="mobile-group">
+    <button data-touch="brake" aria-label="Brake">BRAKE</button>
+    <button data-touch="throttle" class="accelerate" aria-label="Accelerate">
+      GAS
+    </button>
+  </div>
+</div>
 </body></html>

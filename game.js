@@ -23,6 +23,12 @@ class Game{
  this.ui=new UI(this);this.preview();this.applySettings();this.bind();
  document.getElementById('loading').hidden=true;
  this.last=performance.now();this.frame=this.frame.bind(this);requestAnimationFrame(this.frame);
+ this.touchInput = {
+  throttle: false,
+  brake: false,
+  left: false,
+  right: false
+};
  }
  bind(){
  const control=new Set(['KeyW','ArrowUp','KeyS','ArrowDown','KeyA','ArrowLeft','KeyD','ArrowRight','Space','KeyR','KeyP','Escape']);
@@ -69,11 +75,57 @@ class Game{
  if(e.type==='coin')this.reward(1);else{s.fuel=Math.min(this.vehicleStats.tank,s.fuel+this.vehicleStats.tank*.38);this.ui.toast('FUEL +38%');}
  }else if(e.type==='stunt'){this.bonus+=e.points;this.reward(Math.max(1,Math.floor(e.points/100)));this.ui.toast(e.name+' +'+e.points);this.audio.event('coin');}
  else{this.audio.event(e.type);if(e.type==='landing'){this.shake=Math.min(1,e.impact*.055);this.effects.burst(s.x,s.y-.7,25);}}
+ document.querySelectorAll('[data-touch]').forEach(button => {
+  const control = button.dataset.touch;
+
+  const press = event => {
+    event.preventDefault();
+
+    if (button.setPointerCapture) {
+      button.setPointerCapture(event.pointerId);
+    }
+
+    this.touchInput[control] = true;
+    button.classList.add('pressed');
+  };
+
+  const release = event => {
+    event.preventDefault();
+    this.touchInput[control] = false;
+    button.classList.remove('pressed');
+  };
+
+  button.addEventListener('pointerdown', press);
+  button.addEventListener('pointerup', release);
+  button.addEventListener('pointercancel', release);
+  button.addEventListener('lostpointercapture', release);
+});
  }
+ 
  tick(dt){
- this.input.throttle=this.keys.has('KeyW')||this.keys.has('ArrowUp')?1:0;
- this.input.brake=this.keys.has('KeyS')||this.keys.has('ArrowDown')?1:0;
- this.input.tilt=(this.keys.has('KeyA')||this.keys.has('ArrowLeft')?1:0)-(this.keys.has('KeyD')||this.keys.has('ArrowRight')?1:0);
+const throttle =
+  this.keys.has('KeyW') ||
+  this.keys.has('ArrowUp') ||
+  this.touchInput.throttle;
+
+const brake =
+  this.keys.has('KeyS') ||
+  this.keys.has('ArrowDown') ||
+  this.touchInput.brake;
+
+const left =
+  this.keys.has('KeyA') ||
+  this.keys.has('ArrowLeft') ||
+  this.touchInput.left;
+
+const right =
+  this.keys.has('KeyD') ||
+  this.keys.has('ArrowRight') ||
+  this.touchInput.right;
+
+this.input.throttle = throttle ? 1 : 0;
+this.input.brake = brake ? 1 : 0;
+this.input.tilt = (left ? 1 : 0) - (right ? 1 : 0);
  this.input.handbrake=this.keys.has('Space');if(this.input.brake)this.input.throttle=0;
  const s=this.physics.s;
  const events=this.physics.step(dt,this.input,this.weather);this.terrain.collect(s,events);for(const e of events)this.event(e);
@@ -84,15 +136,28 @@ class Game{
  if(rock&&Math.abs(rock.x-s.x)<1.8&&Math.abs(rock.y-s.y)<1.5&&!this.hit.has(rock.id)){this.hit.add(rock.id);s.health-=40/this.vehicleStats.protection;s.vx*=.4;s.av+=2;this.shake=.8;this.audio.event('crash');this.ui.toast('ROCK IMPACT!');}
  if(s.dead){this.record();this.mode='crashing';this.crashTime=0;this.keys.clear();this.audio.event(s.dead==='OUT OF FUEL'?'landing':'crash');this.shake=s.dead==='OUT OF FUEL'?0:1;this.effects.burst(s.x,s.y,70);if(s.dead!=='OUT OF FUEL'&&this.save.data.settings.shake){document.getElementById('crashFlash').classList.add('flash');setTimeout(()=>document.getElementById('crashFlash').classList.remove('flash'),160);}}
  }
- applyLighting(){
- const night=this.weather==='Night',cloud=['Cloudy','Rain','Fog','Snow','Ash'].includes(this.weather);
- this.ambient.intensity=night?.38:cloud?1.7:2.3;this.sun.intensity=night?.45:cloud?1.6:3;
- this.sun.color.setHex(night?0x8fb3ee:0xffedc5);this.renderer.toneMappingExposure=night?1.1:1.2;
- this.scene.fog.near=this.weather==='Fog'?25:this.weather==='Rain'?55:90;
- this.scene.fog.far=this.weather==='Fog'?180:this.weather==='Rain'?270:380;
- this.terrain.mats.road.roughness=this.weather==='Rain'?.3:1;
- for(const c of this.terrain.chunks.values())c.meshes[1].material.roughness=this.weather==='Rain'?.3:1;
- }
+ applySettings() {
+  const s = this.save.data.settings;
+
+  const mobile = matchMedia('(pointer: coarse)').matches;
+
+  const pixelRatio = mobile
+    ? 1
+    : (s.quality === 'high' ? 1.6 : 1);
+
+  this.renderer.setPixelRatio(
+    Math.min(devicePixelRatio, pixelRatio)
+  );
+
+  this.renderer.shadowMap.enabled =
+    !mobile && s.quality === 'high';
+
+  this.sun.castShadow =
+    !mobile && s.quality === 'high';
+
+  this.resize();
+  this.audio.settings = s;
+}
  frame(now){
  const dt=Math.min((now-this.last)/1000,.1);this.last=now;this.clock+=dt;
  if(this.mode==='playing'){
