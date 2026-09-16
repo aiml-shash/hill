@@ -20,7 +20,18 @@ export class Physics{
  fx+=force*nx;fy+=force*ny;torque+=rx*force*ny-ry*force*nx;
  const grip=clamp(v.grip*this.track.grip(wx,weather),.15,1.6);
  let drive=0;
- if(input.throttle>0&&s.fuel>0)drive=v.power*v.mass*5*input.throttle;
+fx -= 0.03 * s.vx * Math.abs(s.vx);
+
+const maxForwardSpeed = 7;
+const maxReverseSpeed = 3;
+
+s.vx = clamp(
+  s.vx + (fx / v.mass) * dt,
+  -maxReverseSpeed,
+  maxForwardSpeed
+);
+
+s.vy += (fy / v.mass) * dt;
  if(input.brake>0)drive=s.vx>1?-30*v.mass*.5: s.fuel>0?-v.power*.3*v.mass:0;
  if(input.handbrake)drive=-s.vx*8*v.mass;
  drive-=s.vx*.09*v.mass;
