@@ -31,7 +31,7 @@ export class Physics{
  s.grounded=contacts>0;
  torque+=input.tilt*(s.grounded?2.7:8)*v.mass;
  torque-=s.av*(s.grounded?3: .65)*v.mass;
-const maxSpeedKmh = v.maxSpeedKmh ?? 215;// Change this to your desired limit
+const maxSpeedKmh = v.maxSpeedKmh ?? 200;// Change this to your desired limit
 
 fx -= 0.008 * s.vx * Math.abs(s.vx);
 s.vx = clamp(
