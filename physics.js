@@ -20,18 +20,7 @@ export class Physics{
  fx+=force*nx;fy+=force*ny;torque+=rx*force*ny-ry*force*nx;
  const grip=clamp(v.grip*this.track.grip(wx,weather),.15,1.6);
  let drive=0;
-fx -= 0.03 * s.vx * Math.abs(s.vx);
-
-const maxForwardSpeed = 7;
-const maxReverseSpeed = 3;
-
-s.vx = clamp(
-  s.vx + (fx / v.mass) * dt,
-  -maxReverseSpeed,
-  maxForwardSpeed
-);
-
-s.vy += (fy / v.mass) * dt;
+ if(input.throttle>0&&s.fuel>0)drive=v.power*v.mass*5*input.throttle;
  if(input.brake>0)drive=s.vx>1?-30*v.mass*.5: s.fuel>0?-v.power*.3*v.mass:0;
  if(input.handbrake)drive=-s.vx*8*v.mass;
  drive-=s.vx*.09*v.mass;
@@ -42,7 +31,7 @@ s.vy += (fy / v.mass) * dt;
  s.grounded=contacts>0;
  torque+=input.tilt*(s.grounded?2.7:8)*v.mass;
  torque-=s.av*(s.grounded?3: .65)*v.mass;
-fx-=.008*s.vx*Math.abs(s.vx);s.vx=clamp(s.vx+fx/v.mass*dt,-5,v.speed*0.6);s.vy+=fy/v.mass*dt;
+fx-=0.03*s.vx*Math.abs(s.vx);s.vx=clamp(s.vx+fx/v.mass*dt,-5,v.speed*0.6);s.vy+=fy/v.mass*dt;
  s.av=clamp(s.av+torque/(v.mass*2.4)*dt,-5.8,5.8);
  s.x+=s.vx*dt;s.y+=s.vy*dt;s.a+=s.av*dt;
  if(s.x<-12){s.x=-12;s.vx=Math.max(0,s.vx);}
