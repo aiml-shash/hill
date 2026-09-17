@@ -26,10 +26,27 @@ export const UPGRADES=[
 export const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 export const upgradeCost=level=>100*level*level;
-export function stats(id,u={}){
- const v={...VEHICLES[id]};
- v.power*=1+.16*((u.engine||1)-1);v.speed*=1+.05*((u.engine||1)-1);
- v.grip*=1+.09*((u.tires||1)-1)+.08*((u.grip||1)-1);
- v.spring*=1+.04*((u.suspension||1)-1);v.protection=1+.2*((u.suspension||1)-1);
- v.tank*=1+.22*((u.tank||1)-1);return v;
+
+ export function stats(id, u = {}) {
+  const v = { ...VEHICLES[id] };
+
+  const engineLevel = Number(u.engine) || 1;
+
+  // Level 1: 215 km/h → Level 5: 300 km/h
+  v.maxSpeedKmh = 215 + (engineLevel - 1) * 21.25;
+  v.speed = v.maxSpeedKmh / 3.6;
+
+  v.power *= 1 + 0.16 * (engineLevel - 1);
+
+  v.grip *=
+    1 +
+    0.09 * ((u.tires || 1) - 1) +
+    0.08 * ((u.grip || 1) - 1);
+
+  v.spring *= 1 + 0.04 * ((u.suspension || 1) - 1);
+  v.protection = 1 + 0.2 * ((u.suspension || 1) - 1);
+
+  v.tank *= 1 + 0.22 * ((u.tank || 1) - 1);
+
+  return v;
 }
