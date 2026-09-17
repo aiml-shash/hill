@@ -34,7 +34,6 @@ export class Physics{
 const maxSpeedKmh = v.maxSpeedKmh ?? 215;// Change this to your desired limit
 
 fx -= 0.008 * s.vx * Math.abs(s.vx);
-
 s.vx = clamp(
   s.vx + (fx / v.mass) * dt,
   -9,
