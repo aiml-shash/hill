@@ -62,7 +62,31 @@ export class Terrain{
  }
  }
  this.batch(group,this.geo.box,this.mats.trunk,trunks);this.batch(group,this.geo.pine,this.mats.tree,pines);this.batch(group,this.geo.rock,this.mats.rock,stones);this.batch(group,this.geo.pine,this.mats.tree,grass);this.batch(group,this.geo.box,this.mats.rail,rails);
- for(let x=Math.ceil(start/8)*8;x<start+64;x+=8){if(x<20)continue;const f=this.track.feature(x),boost=f?.type==='jump'?1.5:0;this.pickup(chunk,'coin',x,this.track.height(x)+1.1+boost);}
+ // Coin groups: 3 or 4 coins, every 150 metres
+for (
+  let k = Math.floor((start - 30) / 150);
+  k <= Math.ceil((start + 64 - 30) / 150);
+  k++
+) {
+  const groupStart = 30 + k * 150;
+  const coinCount = hash(k + 701) > 0.5 ? 4 : 3;
+
+  for (let j = 0; j < coinCount; j++) {
+    const x = groupStart + j * 2.2;
+
+    if (x >= start && x < start + 64 && x > 0) {
+      const f = this.track.feature(x);
+      const boost = f?.type === "jump" ? 1.5 : 0;
+
+      this.pickup(
+        chunk,
+        "coin",
+        x,
+        this.track.height(x) + 1.1 + boost
+      );
+    }
+  }
+}
  for(let x=Math.ceil((start-72)/96)*96+72;x<start+64;x+=96){if(x>=start&&x>0)this.pickup(chunk,'fuel',x,this.track.height(x)+1.1);}
  for(let x=Math.ceil(start/200)*200;x<start+64;x+=200)if(x>0){
  const y=this.track.height(x);for(const z of [-3.4,3.4])this.addMesh(group,this.geo.box,this.mats.white,x,y+2.8,z,.18,5.6,.18);

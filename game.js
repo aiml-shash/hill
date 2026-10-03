@@ -42,7 +42,7 @@ class Game {
     this.runCoins = 0;
     this.bonus = 0;
     this.checkpoint = 0;
-
+    this.checkpointDistance = 1000;
     this.taken = new Set();
     this.hit = new Set();
 
@@ -457,6 +457,7 @@ class Game {
     this.runCoins = 0;
     this.bonus = 0;
     this.checkpoint = 0;
+    this.checkpointDistance = 1000;
     this.taken.clear();
     this.hit.clear();
     this.shake = 0;
@@ -578,7 +579,16 @@ class Game {
 
       return;
     }
+if (eventData.type === "coins") {
+  this.reward(eventData.amount);
 
+  this.ui.toast(
+    `HIGH FLIGHT +${eventData.amount} COINS`
+  );
+
+  this.audio.event("coin");
+  return;
+}
     if (eventData.type === "stunt") {
       this.bonus += eventData.points;
 
@@ -662,33 +672,50 @@ class Game {
       this.event(gameEvent);
     }
 
-    const checkpoint =
-      Math.floor(state.distance / 200);
+    // Checkpoint distances:
+// 1st = 1000m
+// 2nd = 2100m
+// 3rd = 3200m
+// 4th = 4500m
+// etc.
 
-    if (checkpoint > this.checkpoint) {
-      const count = checkpoint - this.checkpoint;
 
-      this.checkpoint = checkpoint;
-      this.reward(25 * count);
 
-      state.fuel = Math.min(
-        this.vehicleStats.tank,
-        state.fuel + this.vehicleStats.tank * 0.12
-      );
+// Checkpoint system
+// 1st = 1000m
+// 2nd = 2100m
+// 3rd = 3200m
+// 4th = 4300m
+// 5th = 5400m
 
-      state.health = Math.min(
-        100,
-        state.health + 5
-      );
+if (state.distance >= this.checkpointDistance) {
+  this.checkpoint++;
 
-      this.save.data.checkpoints[
-        this.save.data.selectedMap
-      ] = checkpoint * 200;
+  // Give reward
+  this.reward(25);
 
-      this.save.write();
-      this.ui.toast("CHECKPOINT! +25 COINS");
-      this.audio.event("upgrade");
-    }
+  // Refill vehicle health to 100%
+  state.health = 100;
+
+  // Refill some fuel
+  state.fuel = Math.min(
+    this.vehicleStats.tank,
+    state.fuel + this.vehicleStats.tank * 0.12
+  );
+
+  // Save checkpoint distance
+  this.save.data.checkpoints[
+    this.save.data.selectedMap
+  ] = this.checkpointDistance;
+
+  this.save.write();
+
+  this.ui.toast("CHECKPOINT! +25 COINS");
+  this.audio.event("upgrade");
+
+  // Next checkpoint is exactly 1100m farther
+  this.checkpointDistance += 1100;
+}
 
     const data = this.save.data;
     const goal = MAPS[data.selectedMap].goal;
